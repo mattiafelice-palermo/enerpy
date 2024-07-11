@@ -2,11 +2,11 @@ import os
 import argparse
 from tabulate import tabulate
 
-from iotools import mdp_to_dictionary, xyz_to_g96
-from orca import write_orca_input, launch_orca_jobs
-from gromacs import run_gromacs, run_gromacs_relaxed
+from .iotools import mdp_to_dictionary, xyz_to_g96
+from .orca import write_orca_input, launch_orca_jobs
+from .gromacs import run_gromacs, run_gromacs_relaxed
 
-from analysis import process_data_and_plot
+from .analysis import process_data_and_plot
 
 def scan_workflow(args):
     # Read parameters and store in a dictionary
@@ -17,9 +17,9 @@ def scan_workflow(args):
         write_orca_input(parameters, args.input_file, threads_per_calc=args.threads_per_calc, cpus=args.total_cores, scan_steps=args.scan_steps, charge=args.charge, multiplicity=args.multiplicity)   
 
         # Create jobs, each cding in the directory and calling orca input and launch through jobdispatcher
-        launch_orca_jobs(parameters, args.threads_per_calc, args.total_cores)
+        launch_orca_jobs(parameters, args.threads_per_calc, args.total_cores, args.orca_module)
 
-    # Convert xyz files to g96 to keep fine geometry details
+    # Convert xyz files to g96 to keep fine geometry details    
     
 
     if args.constrained_opt:
@@ -56,7 +56,11 @@ def scan_workflow(args):
     # Print the table
     print(tabulate(table, headers=headers))#, tablefmt='grid'))
 
-if __name__ == '__main__':
+    if args.optimize:
+        run_optimization_routine()
+
+
+def parse_args():
     parser = argparse.ArgumentParser(description='Scans a set of parameters and creates a folder for each parameter.')
     parser.add_argument('-i', '--input-file', type=str, help='Structure from which to start the calculations from.')
     parser.add_argument('-t', '--topology', type=str, help='Path to the input file containing the parameters to scan.')
@@ -68,5 +72,12 @@ if __name__ == '__main__':
     parser.add_argument('--constrained-opt', action='store_true', help='Perform a constrained optimization.')
     parser.add_argument('--charge', type=int, help='Charge of the simulated specie.')
     parser.add_argument('--multiplicity', type=int, help='Multiplicity of the simulate specie.')
-    args = parser.parse_args()
+    parser.add_argument('--orca-module', type=str, default=None, help='Name of the ORCA module to use.')
+    return parser.parse_args()
+
+def main():
+    args = parse_args()
     scan_workflow(args)
+
+if __name__ == '__main__':
+    main()

@@ -1,8 +1,8 @@
 import numpy as np
 from functools import partial
 from matplotlib import pyplot as plt
-from scipy import curve_fit
-from utils import read_energy_data, convert_energy, normalize_data
+from scipy.optimize import curve_fit
+from .utils import convert_energy, normalize_data
 
 
 def process_data_and_plot(parameter_id, parameter_value, cwd):

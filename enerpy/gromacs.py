@@ -4,8 +4,8 @@ import subprocess
 import textwrap
 import itertools
 
-from iotools import mdp_to_dictionary, get_atom_coordinates
-from utils import calculate_distance
+from .iotools import mdp_to_dictionary, get_atom_coordinates
+from .utils import calculate_distance
 
 
 def run_gromacs(parameters, topology, threads, total_cores):
